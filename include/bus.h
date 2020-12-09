@@ -10,6 +10,12 @@
 struct Location {
     char name[MAX_LOC_NAME_LEN];
     double x, y;
+    int num;
 };
+
+typedef struct Bus {
+    int mem_id;
+    int loc_id;
+}bus_t, *bus_ptr;
 
 #endif

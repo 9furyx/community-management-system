@@ -6,3 +6,4 @@
 #define F_MEMBER   3
 #define F_ROOM     4
 #define F_STAFF    5
+#define F_BUS      6

@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include "linked_list.h"
 
-int l_add(lnode_ptr *head, const void *element) {
+
+// add a new link node
+int l_add(struct Link_Node** head,  void *element) {
     lnode_ptr new_node = (lnode_ptr)malloc(sizeof(lnode_t));
     if (new_node == NULL)
         return -1;
@@ -12,11 +14,13 @@ int l_add(lnode_ptr *head, const void *element) {
     return 0;
 }
 
-int l_delete(lnode_ptr *head, void *element, int (*cmp)(const void *, const void *)) {
+// delete a node and node data using a specific comparision function and data free function
+int l_delete(lnode_ptr *head, void *element, const int (*cmp)(const void *, const void *), const void (*free_data)(const void *)) {
     while (*head != NULL) {
         if (cmp(element, (*head)->t_ptr)) {
             lnode_ptr entry = *head;
             *head = entry->next;
+            free_data(entry->t_ptr);
             free(entry);
             return 0;
         } else
@@ -25,7 +29,8 @@ int l_delete(lnode_ptr *head, void *element, int (*cmp)(const void *, const void
     return -1;
 }
 
-lnode_ptr l_find(lnode_ptr *head, const void *element, int (*cmp)(const void *,const void *)) {
+// find a node using a specific comparision function
+lnode_ptr l_find(lnode_ptr *head, const void *element, const int (*cmp)(const void *, const void *)) {
     lnode_ptr curr = *head;
     while (curr != NULL) {
         if (cmp(element, curr->t_ptr)) {
@@ -36,7 +41,8 @@ lnode_ptr l_find(lnode_ptr *head, const void *element, int (*cmp)(const void *,c
     return NULL;
 }
 
-void l_recycle(lnode_ptr *head) {
+// recycle all node memory
+void l_recycle(lnode_ptr *head, void (*free_data)(const void *)) {
     while (*head) {
         lnode_ptr entry = *head;
         *head = (*head)->next;

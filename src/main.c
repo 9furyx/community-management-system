@@ -2,7 +2,6 @@
 #include "defs.h"
 
 int main(int argc, char *argv[]) {
-    file_init(argc, argv + 1);
-    
-
+    if (argc <= 0) return 0;
+    init(argc, argv);
 }
