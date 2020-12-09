@@ -17,3 +17,8 @@ int get_int() {
     }
     return input_id;
 }
+
+// clear shell content
+void clear_sh() {
+    system("clear || cls");  // compatible with both POSIX and WIN32
+}
