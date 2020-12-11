@@ -4,13 +4,18 @@
 #include "defs.h"
 #include "path.h"
 
-static char* mainui_subpath[] = {"", "会员管理", "班车管理"};
+static char* mainui_subpath[] = {"", 
+    "会员管理", 
+    "班车管理", 
+    "房屋管理"
+};
 void print_main_menu() {
     printf("*********************\n");
     printf("长者社区管理系统\n");
     printf("*********************\n");
     printf("1.%s\n", mainui_subpath[1]);
     printf("2.%s\n", mainui_subpath[2]);
+    printf("3.%s\n", mainui_subpath[3]);
     printf("0.退出\n");
 }
 
@@ -31,6 +36,11 @@ void main_ui() {
             case 2:
                 cd_ch(mainui_subpath[2]);
                 bus_ui();
+                cd_fa();
+                break;
+            case 3:
+                cd_ch(mainui_subpath[3]);
+                room_ui();
                 cd_fa();
                 break;
             case 0:

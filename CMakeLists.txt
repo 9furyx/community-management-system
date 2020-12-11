@@ -5,13 +5,13 @@ project (res_sys)
 set(SOURCES
     src/bus.c
     src/util.c
-    src/clear_sh.c
     src/member.c
     src/linked_list_template.c
     src/main.c
     src/init.c
     src/main_ui.c
     src/path.c
+    src/room.c
 )
 
 add_executable(test ${SOURCES})

@@ -30,6 +30,11 @@ void list_member(void);
 int read_member(FILE *);
 
 
+// room.c
+int read_room(FILE *);
+void room_ui();
+int buy_room(int);
+
 // linked_list.c
 int l_add(struct Link_Node **, const void *);
 int l_delete(struct Link_Node **, void *, int (*)(const void *, const void *), void (*)(const void *));

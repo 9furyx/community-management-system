@@ -9,7 +9,7 @@ static int (*fflags[])() = {
     [F_LOCATION] read_location,
     [F_MEMBER] read_member,
     [F_BUS] read_bus,
-    //[F_ROOM] Read_Room,
+    [F_ROOM] read_room,
     //[F_STAFF] Read_Staff,
 };
 

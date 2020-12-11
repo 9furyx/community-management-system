@@ -75,11 +75,11 @@ void print_mem_menu() {
 }
 
 void add_member_ui() {
-    clear_sh();
-    print_curr_path();
-    char buf[MAX_MEMBER_NAME_LEN];
-    printf("请输入会员名, 输入#结束:\n");
     while (1) {
+        clear_sh();
+        print_curr_path();
+        char buf[MAX_MEMBER_NAME_LEN];
+        printf("请输入会员名, 输入#结束:\n");
         scanf("%s", buf);
         if (buf[0] == '#')
             break;
@@ -90,6 +90,14 @@ void add_member_ui() {
         }
         add_member(memn, 0, buf);
         printf("已加入会员: %s\n", buf);
+        printf("是否要购买房屋, 1是, 0否:\n");
+        int choice = -1;
+        choice = get_int();
+        if (choice == 1) {
+            cd_ch("购买房屋");
+            buy_room(memn);
+            cd_fa();
+        }
     }
 }
 

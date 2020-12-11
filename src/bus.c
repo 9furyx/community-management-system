@@ -81,7 +81,10 @@ int del_bus_mem_from_link(int id) {
 }
 
 bus_ptr find_bus_member(int id) {
-    return (bus_ptr)(l_find(&bus_head, &id, cmp)->t_ptr);
+    lnode_ptr result = l_find(&bus_head, &id, cmp);
+    if(result == NULL)
+        return NULL;
+    return result->t_ptr;
 }
 
 void list_bus_rsv_member() {
@@ -89,8 +92,12 @@ void list_bus_rsv_member() {
     printf("当前所有会员及选择的目的地:\n");
     lnode_ptr curr = mem_head;
     while (curr != NULL) {
-        member_ptr entry = (member_ptr)(curr->t_ptr);
-        printf("id:%d %s loc_id: %d\n", entry->id, entry->name, find_bus_member(entry->id)->loc_id);
+        if (curr->t_ptr != NULL) {
+            member_ptr entry = (member_ptr)(curr->t_ptr);
+            bus_ptr f_mem = find_bus_member(entry->id);
+            if (f_mem != NULL)
+                printf("id:%d %s loc_id: %d\n", entry->id, entry->name, f_mem->loc_id);
+        }
         curr = curr->next;
     }
 }
