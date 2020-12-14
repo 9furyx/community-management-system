@@ -25,21 +25,43 @@ int read_location(FILE *fp) {
     return 0;
 }
 
+int write_location(FILE *fp) {
+    fprintf(fp, "location-name location-dirx location-diry\n");
+    for (int i = 1; i <= locn; ++i)
+        fprintf(fp, "%s %lf %lf\n", loc[i].name, loc[i].x, loc[i].y);
+    return 0;
+}
+
 int read_bus(FILE *fp) {
     int mem_id, loc_id;
     while (fscanf(fp, "%d%d", &mem_id, &loc_id) != EOF)
         add_bus_mem_to_link(mem_id, loc_id);
     return 0;
 }
-static char *bus_menu_subp[] = {"", "班车预约", "路线规划"};
+
+int write_bus(FILE *fp) {
+    lnode_ptr curr = bus_head;
+    fprintf(fp, "member-id location_id\n");
+    while (curr != NULL) {
+        int loc_id = ((bus_ptr)(curr->t_ptr))->loc_id;
+        int mem_id = ((bus_ptr)(curr->t_ptr))->mem_id;
+        fprintf(fp, "%d %d\n", mem_id, loc_id);
+        curr = curr->next;
+    }
+    return 0;
+}
+
+static char *bus_menu_subp[] = {"", "班车预约", "路线规划", "增加地点"};
 void print_bus_menu() {
     printf("*********************\n");
     printf("班车管理系统\n");
     printf("*********************\n");
     printf("1.%s\n", bus_menu_subp[1]);
     printf("2.%s\n", bus_menu_subp[2]);
+    printf("3.%s\n", bus_menu_subp[3]);
     printf("0.返回\n");
 }
+
 static char *bus_rsv_subp[] = {"", "会员预约", "取消预约"};
 void print_bus_rsv_menu() {
     printf("**********\n");
@@ -82,7 +104,7 @@ int del_bus_mem_from_link(int id) {
 
 bus_ptr find_bus_member(int id) {
     lnode_ptr result = l_find(&bus_head, &id, cmp);
-    if(result == NULL)
+    if (result == NULL)
         return NULL;
     return result->t_ptr;
 }
@@ -144,8 +166,29 @@ void cancle_bus_rsv() {
     }
 }
 
+int add_location() {
+    clear_sh();
+    print_curr_path();
+    char buf[MAX_LOC_NAME_LEN];
+    double dirx, diry;
+    if (locn >= MAX_LOC_NUM) {
+        printf("已达最大上限\n");
+        return -1;
+    }
+    printf("请输入新增地点名称, 座标x, 座标y:\n");
+    scanf("%s%lf%lf", buf, &dirx, &diry);
+    memcpy(loc[++locn].name, buf, sizeof(buf));
+    loc[locn].x = dirx, loc[locn].y = diry;
+    printf("已增加地点: %s\n", loc[locn].name);
+    printf("输入任意键返回\n");
+    getchar();
+    getchar();
+    return 0;
+}
+
 void bus_route_man() {
     clear_sh();
+    print_curr_path();
     printf("当前规划路线:\n");
     for (int i = 1; i <= locn; ++i) {
         if (loc[i].num > 0) {
@@ -204,6 +247,11 @@ void bus_ui() {
             case 2:
                 cd_ch(bus_menu_subp[2]);
                 bus_route_man();
+                cd_fa();
+                break;
+            case 3:
+                cd_ch(bus_menu_subp[3]);
+                add_location();
                 cd_fa();
                 break;
             case 0:

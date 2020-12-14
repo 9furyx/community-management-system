@@ -1,4 +1,4 @@
-#define FLAGN 5  // number of flags
+#define FLAGN 10  // number of flags
 #define FLEN 16  // flag length
 
 #define F_FACILITY 1

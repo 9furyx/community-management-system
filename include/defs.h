@@ -18,7 +18,9 @@ void bus_rsv_man(void);
 void bus_route_man(void);
 void list_location(void);
 int read_location(FILE *);
+int write_location(FILE *);
 int read_bus(FILE *);
+int write_bus(FILE *);
 void add_bus_rsv_member(void);
 int add_bus_mem_to_link(int, int);
 
@@ -28,10 +30,12 @@ void mem_ui(void);
 int get_member_num(void);
 void list_member(void);
 int read_member(FILE *);
+int write_member(FILE *);
 
 
 // room.c
 int read_room(FILE *);
+int write_room(FILE *);
 void room_ui();
 int buy_room(int);
 

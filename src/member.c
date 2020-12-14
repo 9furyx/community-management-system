@@ -48,6 +48,20 @@ int read_member(FILE *fp) {
     }
 }
 
+int write_member(FILE *fp) {
+    char buf[MAX_MEMBER_NAME_LEN];
+    int room_id = 0;
+    int mem_id = 0;
+    lnode_ptr curr = mem_head;
+    fprintf(fp, "member-id member-name rent-room-id\n");
+    while (curr != NULL) {
+        member_ptr entry = (member_ptr)(curr->t_ptr);
+        fprintf(fp, "%d %s %d\n", entry->id, entry->name, entry->room_id);
+        curr = curr->next;
+    }
+    return 0;
+}
+
 int get_member_num() {
     return memn;
 }
