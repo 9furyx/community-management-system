@@ -12,13 +12,17 @@ set(SOURCES
     src/main_ui.c
     src/path.c
     src/room.c
+    src/checkin.c
+    src/quick_sort.c
 )
 
-add_executable(test ${SOURCES})
+add_executable(ecms ${SOURCES})
 
-target_include_directories(test
+target_include_directories(ecms
     PRIVATE 
         ${PROJECT_SOURCE_DIR}/include
 )
+
+target_link_libraries(ecms m)
 
 set(CMAKE_BUILD_TYPE Debug)

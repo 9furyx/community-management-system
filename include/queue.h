@@ -1,3 +1,7 @@
+#ifndef __QUEUE_H__
+#define __QUEUE_H__
+
+
 #define QElemType int
 
 typedef struct QNode {
@@ -11,3 +15,6 @@ typedef struct Queue
     qnode_ptr back;
     int size;
 } queue, *queue_ptr;
+
+
+#endif

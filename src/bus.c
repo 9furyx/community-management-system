@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+#include <math.h>
 #include "defs.h"
 #include "bus.h"
 #include "member.h"
@@ -10,15 +12,14 @@
 lnode_ptr bus_head = NULL;
 struct Location loc[MAX_LOC_NUM];
 int locn = 0;
-int dis[MAX_LOC_NUM][MAX_LOC_NUM];
 
 int read_location(FILE *fp) {
     locn = 0;
     char buf[MAX_LOC_NAME_LEN];
     double dirx, diry;
-    while (fscanf(fp, "%s%lf%lf", buf, &dirx, &diry) != EOF) {
-        if (locn >= MAX_LOC_NUM)
-            return 0;
+    while (fscanf(fp, "%lf%lf ", &dirx, &diry) != EOF &&
+           my_getline(fp, buf) != -1) {
+        if (locn >= MAX_LOC_NUM) return 0;
         memcpy(loc[++locn].name, buf, sizeof(buf));
         loc[locn].x = dirx, loc[locn].y = diry;
     }
@@ -28,7 +29,7 @@ int read_location(FILE *fp) {
 int write_location(FILE *fp) {
     fprintf(fp, "location-name location-dirx location-diry\n");
     for (int i = 1; i <= locn; ++i)
-        fprintf(fp, "%s %lf %lf\n", loc[i].name, loc[i].x, loc[i].y);
+        fprintf(fp, "%lf %lf %s\n", loc[i].name, loc[i].x, loc[i].y);
     return 0;
 }
 
@@ -76,17 +77,14 @@ void print_bus_rsv_menu() {
 void list_location() {
     printf("*********************\n");
     printf("当前可选地点:\n");
-    for (int i = 1; i <= locn; ++i)
-        printf("%d: %s\n", i, loc[i].name);
+    for (int i = 1; i <= locn; ++i) printf("%d: %s\n", i, loc[i].name);
 }
 
 // specific funcion used in linked list template
 static int cmp(const void *id, const void *node) {
     return *(int *)id == ((bus_ptr)node)->mem_id;
 }
-static void free_data(const void *bus) {
-    free(((bus_ptr)bus));
-}
+static void free_data(const void *bus) { free(((bus_ptr)bus)); }
 
 // main utils
 
@@ -104,21 +102,21 @@ int del_bus_mem_from_link(int id) {
 
 bus_ptr find_bus_member(int id) {
     lnode_ptr result = l_find(&bus_head, &id, cmp);
-    if (result == NULL)
-        return NULL;
+    if (result == NULL) return NULL;
     return result->t_ptr;
 }
 
 void list_bus_rsv_member() {
     printf("*********************\n");
-    printf("当前所有会员及选择的目的地:\n");
+    printf("当前预约会员及选择的目的地:\n");
     lnode_ptr curr = mem_head;
     while (curr != NULL) {
         if (curr->t_ptr != NULL) {
             member_ptr entry = (member_ptr)(curr->t_ptr);
             bus_ptr f_mem = find_bus_member(entry->id);
-            if (f_mem != NULL)
-                printf("id:%d %s loc_id: %d\n", entry->id, entry->name, f_mem->loc_id);
+            if (f_mem != NULL && f_mem->loc_id != 0)
+                printf("会员id:%d    %-10s    地点id: %d\n", entry->id, entry->name,
+                       f_mem->loc_id);
         }
         curr = curr->next;
     }
@@ -126,6 +124,7 @@ void list_bus_rsv_member() {
 void add_bus_rsv_member() {
     clear_sh();
     print_curr_path();
+    list_member();
     list_bus_rsv_member();
     puts("\n");
     list_location();
@@ -138,7 +137,8 @@ void add_bus_rsv_member() {
         if (mem_id == 0) break;
         loc_id = get_int();
         if (loc_id == 0) break;
-        if (mem_id > get_member_num() || loc_id > locn || mem_id == -1 || loc_id == -1) {
+        if (mem_id > get_member_num() || loc_id > locn || mem_id == -1 ||
+            loc_id == -1 || find_bus_member(mem_id) != NULL) {
             printf("请输入合法的会员编号和地点编号.\n");
         } else {
             add_bus_mem_to_link(mem_id, loc_id);
@@ -160,7 +160,7 @@ void cancle_bus_rsv() {
             printf("请输入合法的会员编号.\n");
         } else {
             del_bus_mem_from_link(mem_id);
-            add_bus_mem_to_link(mem_id, 0);
+            // add_bus_mem_to_link(mem_id, 0);
             printf("会员:%d  的班车预约已取消\n", mem_id);
         }
     }
@@ -169,15 +169,19 @@ void cancle_bus_rsv() {
 int add_location() {
     clear_sh();
     print_curr_path();
-    char buf[MAX_LOC_NAME_LEN];
-    double dirx, diry;
+    getchar();
+    char *buf_ptr;
+    char buf[MAX_MEMBER_NAME_LEN];
+    double dirx = 0, diry = 0;
     if (locn >= MAX_LOC_NUM) {
         printf("已达最大上限\n");
         return -1;
     }
-    printf("请输入新增地点名称, 座标x, 座标y:\n");
-    scanf("%s%lf%lf", buf, &dirx, &diry);
-    memcpy(loc[++locn].name, buf, sizeof(buf));
+    printf("请输入新增地点名称\n");
+    my_getline(stdin, buf);
+    printf("请输入新增地点座标x, y\n");
+    scanf("%lf%lf", &dirx, &diry);
+    memcpy(loc[++locn].name, buf, sizeof(loc[locn].name));
     loc[locn].x = dirx, loc[locn].y = diry;
     printf("已增加地点: %s\n", loc[locn].name);
     printf("输入任意键返回\n");
@@ -186,17 +190,85 @@ int add_location() {
     return 0;
 }
 
+// use simulated annealing to calculate approximately TSP
+int *tsp_sa(double dis[MAX_LOC_NUM][MAX_LOC_NUM], int r_locn,
+            const int *ori_rout) {
+    static const double INI_T = 1000000, esp = 1e-10, dlt = 0.998, INF = 1e10;
+    static int ans_r[MAX_LOC_NUM];
+
+    int curr_rout[MAX_LOC_NUM];
+    double now = INF;
+    double ans = INF;
+    memcpy(curr_rout, ori_rout, sizeof(curr_rout));
+    memcpy(ans_r, curr_rout, sizeof(ans_r));
+    srand(time(0));
+
+    for (double T = INI_T; T > esp; T *= dlt) {
+        int x = 0, y = 0;
+        while (x == y) x = rand() % r_locn + 1, y = rand() % r_locn + 1;
+        // make sure x and y are different
+        swap(&curr_rout[x], &curr_rout[y]);
+
+        double nxt = 0;
+        for (int i = 1; i <= r_locn; ++i)
+            nxt += dis[curr_rout[i - 1]][curr_rout[i]] *
+                   loc[curr_rout[i]].num;  // calculate time cost
+
+        if (nxt < now) {
+            now = nxt;
+            if (nxt < ans) {
+                ans = nxt;
+                memcpy(ans_r, curr_rout, sizeof(ans_r));
+            }
+            continue;
+        }
+        if (exp((now - nxt) / T) * RAND_MAX < rand()) {
+            now = nxt;
+            continue;
+        }
+        swap(&curr_rout[x], &curr_rout[y]);
+    }
+    return ans_r;
+}
+
 void bus_route_man() {
     clear_sh();
     print_curr_path();
-    printf("当前规划路线:\n");
-    for (int i = 1; i <= locn; ++i) {
+
+    int now[MAX_LOC_NUM], p = 0;
+    double dis[MAX_LOC_NUM][MAX_LOC_NUM];
+    now[0] = 0;
+    int tot_num = 0;  // all members number
+    for (int i = 1; i <= locn; ++i)
         if (loc[i].num > 0) {
-            printf("%s", loc[i].name);
-            if (i != locn) printf(" -> ");
+            now[++p] = i;
+            tot_num += loc[i].num;
+            dis[i][0] = dis[0][i] =
+                fabs(COMM_X - loc[i].x) +
+                fabs(COMM_Y - loc[i].y);  // community to others' distance
+        }
+    for (int i = 1; i <= p; ++i) {
+        for (int j = 1; j < i; ++j) {
+            double x1 = loc[now[i]].x;
+            double y1 = loc[now[i]].y;
+            double x2 = loc[now[j]].x;
+            double y2 = loc[now[j]].y;
+            dis[now[j]][now[i]] = dis[now[i]][now[j]] =
+                fabs(x1 - x2) +
+                fabs(y1 - y2);  // as all road lies perpendicular to each
+                                // other, we use the sum of delta x and
+                                // delta y to represent total distance
         }
     }
-    printf("\n\n按任意键返回\n");
+    int *ans_route;
+    // memcpy(ans_route, now, sizeof(now));
+    if (p > 1) ans_route = tsp_sa(dis, p, now);
+
+    printf("当前规划路线:\n");
+    printf("社区 -> ");
+    for (int i = 1; i <= p; ++i) printf("%s -> ", loc[ans_route[i]].name);
+    printf("社区\n");
+    printf("\n按任意键返回\n");
     getchar();
     getchar();
 }

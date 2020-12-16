@@ -2,28 +2,31 @@
 #include "room.h"
 #include "utils.h"
 #include "defs.h"
+#include "member.h"
 
-struct Room room[MAX_ROOM_NUM];
+room_t room[MAX_ROOM_NUM];
 int roomn;
 
 int read_room(FILE *fp) {
     roomn = 0;
-    int room_id, owner_mem_id, rent_mem_id;
-    while (fscanf(fp, "%d%d%d", &room_id, &owner_mem_id, &rent_mem_id) != EOF) {
+    int room_id, owner_mem_id, rent_mem_id, price;
+    while (fscanf(fp, "%d%d%d%d", &room_id, &owner_mem_id, &rent_mem_id,
+                  &price) != EOF) {
         if (roomn >= MAX_ROOM_NUM) return 0;
         room[++roomn].room_id = room_id;
         room[roomn].owner_mem_id = owner_mem_id;
         room[roomn].rent_mem_id = rent_mem_id;
+        room[roomn].price = price;
     }
     return 0;
 }
 
 int write_room(FILE *fp) {
     int room_id, owner_mem_id, rent_mem_id;
-    fprintf(fp, "room-id owner-id renter-id\n");
+    fprintf(fp, "room-id owner-id renter-id price\n");
     for (int i = 1; i <= roomn; ++i) {
-        fprintf(fp, "%d %d %d\n", room[i].room_id, room[i].owner_mem_id,
-                room[i].rent_mem_id);
+        fprintf(fp, "%d %d %d %d\n", room[i].room_id, room[i].owner_mem_id,
+                room[i].rent_mem_id, room[i].price);
     }
     return 0;
 }
@@ -37,10 +40,24 @@ void list_empty_room() {
 void list_ub_room() {
     printf("当前未购买的房屋:\n");
     for (int i = 1; i <= roomn; ++i) {
-        if (!room[i].owner_mem_id) printf("roomid: %d\n", room[i].room_id);
+        if (!room[i].owner_mem_id)
+            printf("roomid: %d    price: %d\n", room[i].room_id, room[i].price);
     }
 }
-
+void list_room_owner() {
+    clear_sh();
+    print_curr_path();
+    for (int i = 1; i <= roomn; ++i) {
+        if (room[i].owner_mem_id != 0)
+            printf("room_id: %d owner: %s\n", room[i].room_id,
+                   find_member(room[i].owner_mem_id)->name);
+        else
+            printf("room_id: %d owner: \n", room[i].room_id);
+    }
+    printf("输入任意键结束\n");
+    getchar();
+    getchar();
+}
 int buy_room(int input_mem_id) {
     clear_sh();
     print_curr_path();
@@ -80,27 +97,40 @@ int buy_room(int input_mem_id) {
     }
 }
 
+int room_price_cmp(const void *a, const void *b) {
+    return ((room_ptr)a)->price - ((room_ptr)b)->price;
+}
 int add_new_room() {
     clear_sh();
+    print_curr_path();
     printf("输入新建房屋的数目:\n");
     int num;
     num = get_int();
-    if (roomn + num > MAX_ROOM_NUM) {
-        printf("已达最大房屋上限\n");
-    } else {
-        for (int i = roomn + 1; i <= roomn + num; ++i) {
-            room[i].room_id = i;
-            room[i].owner_mem_id = 0;
-            room[i].rent_mem_id = 0;
-        }
-        roomn += num;
+    while (num == -1 || roomn + num > MAX_ROOM_NUM) {
+        printf("输入错误或已达最大房屋上限,请重新输入");
+        num = get_int();
     }
+    printf("输入每间房屋的价格:\n");
+
+    for (int i = roomn + 1; i <= roomn + num; ++i) {
+        int price = get_int();
+        while (price == -1) {
+            printf("请输入正确的数字:\n");
+            price = get_int();
+        }
+        room[i].room_id = i;
+        room[i].price = price;
+        room[i].owner_mem_id = 0;
+        room[i].rent_mem_id = 0;
+    }
+    roomn += num;
+    quick_sort(room, roomn + 1, sizeof(room_t), room_price_cmp);
     printf("输入任意键返回\n");
     getchar();
     getchar();
 }
 
-static char *room_menu_subp[] = {"", "添加房屋", "购买房屋"};
+static char *room_menu_subp[] = {"", "添加房屋", "购买房屋", "查看房屋所有者"};
 
 void print_room_menu() {
     printf("**********\n");
@@ -108,6 +138,7 @@ void print_room_menu() {
     printf("**********\n");
     printf("1.%s\n", room_menu_subp[1]);
     printf("2.%s\n", room_menu_subp[2]);
+    printf("3.%s\n", room_menu_subp[3]);
     printf("0.返回\n");
 }
 
@@ -128,6 +159,11 @@ void room_ui() {
             case 2:
                 cd_ch(room_menu_subp[2]);
                 buy_room(0);
+                cd_fa();
+                break;
+            case 3:
+                cd_ch(room_menu_subp[3]);
+                list_room_owner();
                 cd_fa();
                 break;
             case 0:

@@ -1,3 +1,5 @@
+// main user interface of the program
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,7 +9,8 @@
 static char* mainui_subpath[] = {"", 
     "会员管理", 
     "班车管理", 
-    "房屋管理"
+    "房屋管理",
+    "入住管理"
 };
 void print_main_menu() {
     printf("*********************\n");
@@ -16,6 +19,7 @@ void print_main_menu() {
     printf("1.%s\n", mainui_subpath[1]);
     printf("2.%s\n", mainui_subpath[2]);
     printf("3.%s\n", mainui_subpath[3]);
+    printf("4.%s\n", mainui_subpath[4]);
     printf("0.退出\n");
 }
 
@@ -43,6 +47,9 @@ void main_ui() {
                 room_ui();
                 cd_fa();
                 break;
+            case 4:
+                cd_ch(mainui_subpath[4]);
+                checkin_ui();
             case 0:
                 clear_sh();
                 break;

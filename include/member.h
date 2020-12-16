@@ -1,6 +1,7 @@
 #ifndef __MEMBER_H__
 #define __MEMBER_H__
 
+
 #define MAX_MEMBER_NAME_LEN 64 // maximum member name length
 #define MAX_MAMBER_NUM 256  // maximum member number
 
@@ -15,5 +16,6 @@ struct Member {
 
 
 extern struct Link_Node *mem_head;
+
 
 #endif

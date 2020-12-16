@@ -1,14 +1,15 @@
+// utilities that being used frequently
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "member.h"
 
-//swap two variables
-#define swap(lhs, rhs, type) \
-    type temp = lhs;         \
-    lhs = rhs;               \
-    rhs = tmp;
-
+void swap(int *a, int *b) {
+    int tmp = *a;
+    *a = *b;
+    *b = tmp;
+}
 // safely get an integer from stdin
 int get_int() {
     static char buf[16];
@@ -25,7 +26,19 @@ int get_int() {
     return input_id;
 }
 
+int my_getline(FILE *stream, char *string) {
+    int p = 0;
+    char c = fgetc(stream);
+    while (c != '\n' && c != EOF) {
+        string[p++] = c;
+        c = fgetc(stream);
+    }
+    if (c == EOF) return -1;
+    string[p] = '\0';
+    return 0;
+}
+
 // clear shell content
 void clear_sh() {
-    system("clear || cls");  // compatible with both POSIX and WIN32
+    system("clear || cls");  // compatible with both POSIX and WIN32 api
 }

@@ -41,7 +41,7 @@ int read_member(FILE *fp) {
     char buf[MAX_MEMBER_NAME_LEN];
     int room_id = 0;
     int mem_id = 0;
-    while (fscanf(fp, "%d%s%d", &mem_id, buf, &room_id) != EOF) {
+    while (fscanf(fp, "%d%d ", &mem_id, &room_id) != EOF && my_getline(fp, buf) != -1) {
         if (++memn > MAX_MAMBER_NUM)
             return 0;
         add_member(mem_id, room_id, buf);
@@ -56,7 +56,8 @@ int write_member(FILE *fp) {
     fprintf(fp, "member-id member-name rent-room-id\n");
     while (curr != NULL) {
         member_ptr entry = (member_ptr)(curr->t_ptr);
-        fprintf(fp, "%d %s %d\n", entry->id, entry->name, entry->room_id);
+        if (entry != NULL)
+            fprintf(fp, "%d %d %s\n", entry->id, entry->room_id, entry->name);
         curr = curr->next;
     }
     return 0;
@@ -71,7 +72,7 @@ void list_member() {
     lnode_ptr curr = mem_head;
     while (curr != NULL) {
         member_ptr entry = (member_ptr)(curr->t_ptr);
-        printf("id:%d %s\n", entry->id, entry->name);
+        printf("id:%d    %-20s    租住房屋: %d\n", entry->id, entry->name, entry->room_id);
         curr = curr->next;
     }
 }
@@ -89,12 +90,15 @@ void print_mem_menu() {
 }
 
 void add_member_ui() {
+    clear_sh();
+    print_curr_path();
+    getchar();
     while (1) {
-        clear_sh();
-        print_curr_path();
+        //char buf[MAX_MEMBER_NAME_LEN];
         char buf[MAX_MEMBER_NAME_LEN];
         printf("请输入会员名, 输入#结束:\n");
-        scanf("%s", buf);
+        my_getline(stdin, buf);
+        //scanf("%s", buf);
         if (buf[0] == '#')
             break;
         if (++memn > MAX_MAMBER_NUM) {
@@ -104,14 +108,14 @@ void add_member_ui() {
         }
         add_member(memn, 0, buf);
         printf("已加入会员: %s\n", buf);
-        printf("是否要购买房屋, 1是, 0否:\n");
+        /*printf("是否要购买房屋, 1是, 0否:\n");
         int choice = -1;
         choice = get_int();
         if (choice == 1) {
             cd_ch("购买房屋");
             buy_room(memn);
             cd_fa();
-        }
+        }*/
     }
 }
 
@@ -127,8 +131,10 @@ void del_member_ui() {
             break;
         if (del_member(mem_id) == -1) {
             printf("该会员不存在\n");
-        } else
+        } else {
             printf("已删除会员: %d\n", mem_id);
+            memn--;
+        }
     }
 }
 

@@ -3,6 +3,8 @@
 #include "linked_list.h"
 
 
+typedef const int *cmp_t(const void *, const void *);
+
 // add a new link node
 int l_add(struct Link_Node** head,  void *element) {
     lnode_ptr new_node = (lnode_ptr)malloc(sizeof(lnode_t));
@@ -15,7 +17,7 @@ int l_add(struct Link_Node** head,  void *element) {
 }
 
 // delete a node and node data using a specific comparision function and data free function
-int l_delete(lnode_ptr *head, void *element, const int (*cmp)(const void *, const void *), const void (*free_data)(const void *)) {
+int l_delete(lnode_ptr *head, void *element, cmp_t cmp, const void (*free_data)(const void *)) {
     while (*head != NULL) {
         if (cmp(element, (*head)->t_ptr)) {
             lnode_ptr entry = *head;
@@ -30,7 +32,7 @@ int l_delete(lnode_ptr *head, void *element, const int (*cmp)(const void *, cons
 }
 
 // find a node using a specific comparision function
-lnode_ptr l_find(lnode_ptr *head, const void *element, const int (*cmp)(const void *, const void *)) {
+lnode_ptr l_find(lnode_ptr *head, const void *element, cmp_t cmp) {
     lnode_ptr curr = *head;
     while (curr != NULL) {
         if (cmp(element, curr->t_ptr)) {
