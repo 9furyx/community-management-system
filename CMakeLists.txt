@@ -14,6 +14,7 @@ set(SOURCES
     src/room.c
     src/checkin.c
     src/quick_sort.c
+    src/staff.c
 )
 
 add_executable(ecms ${SOURCES})

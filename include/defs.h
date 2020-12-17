@@ -42,6 +42,11 @@ void room_ui();
 int buy_room(int);
 void list_empty_room(void);
 
+// staff.c
+void staff_ui(void);
+int read_staff(FILE *);
+int write_staff(FILE *);
+
 // linked_list.c
 int l_add(struct Link_Node **, const void *);
 int l_delete(struct Link_Node **, void *, cmp_t, void (*)(const void *));

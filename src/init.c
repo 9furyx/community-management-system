@@ -14,7 +14,7 @@ static int (*rfflags[])() = {
     [F_MEMBER] read_member,
     [F_BUS] read_bus,
     [F_ROOM] read_room,
-    //[F_STAFF] Read_Staff,
+    [F_STAFF] read_staff,
 };
 
 // write file functions
@@ -23,6 +23,7 @@ static int (*wfflags[])() = {
     [F_MEMBER] write_member,
     [F_BUS] write_bus,
     [F_ROOM] write_room,
+    [F_STAFF] write_staff,
 };
 
 // defined file names

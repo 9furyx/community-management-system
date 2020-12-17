@@ -14,9 +14,7 @@ int memn = 0;
 static int cmp(const void *id, const void *node) {
     return *(int *)id == ((member_ptr)node)->id;
 }
-static void free_data(const void *mem) {
-    free(((member_ptr)mem));
-}
+static void free_data(const void *mem) { free(((member_ptr)mem)); }
 
 // main utils
 
@@ -28,12 +26,12 @@ int add_member(int id, int room_id, char *name) {
     return l_add(&mem_head, t);
 }
 
-int del_member(int id) {
-    return l_delete(&mem_head, &id, cmp, free_data);
-}
+int del_member(int id) { return l_delete(&mem_head, &id, cmp, free_data); }
 
 member_ptr find_member(int id) {
-    return (member_ptr)(l_find(&mem_head, &id, cmp)->t_ptr);
+    lnode_ptr res = l_find(&mem_head, &id, cmp);
+    if (res != NULL) return (member_ptr)(res->t_ptr);
+    return NULL;
 }
 
 int read_member(FILE *fp) {
@@ -41,9 +39,9 @@ int read_member(FILE *fp) {
     char buf[MAX_MEMBER_NAME_LEN];
     int room_id = 0;
     int mem_id = 0;
-    while (fscanf(fp, "%d%d ", &mem_id, &room_id) != EOF && my_getline(fp, buf) != -1) {
-        if (++memn > MAX_MAMBER_NUM)
-            return 0;
+    while (fscanf(fp, "%d%d ", &mem_id, &room_id) != EOF &&
+           my_getline(fp, buf) != -1) {
+        if (++memn > MAX_MAMBER_NUM) return 0;
         add_member(mem_id, room_id, buf);
     }
 }
@@ -63,44 +61,32 @@ int write_member(FILE *fp) {
     return 0;
 }
 
-int get_member_num() {
-    return memn;
-}
+int get_member_num() { return memn; }
 void list_member() {
     printf("*********************\n");
     printf("当前所有会员:\n");
     lnode_ptr curr = mem_head;
     while (curr != NULL) {
         member_ptr entry = (member_ptr)(curr->t_ptr);
-        printf("id:%d    %-20s    租住房屋: %d\n", entry->id, entry->name, entry->room_id);
+        printf("id:%d    %-20s    租住房屋: %d\n", entry->id, entry->name,
+               entry->room_id);
         curr = curr->next;
     }
 }
 
 // User Interface
-static char *mem_subp[] = {"", "查看会员列表", "添加会员", "删除会员"};
-void print_mem_menu() {
-    printf("*********************\n");
-    printf("会员管理系统\n");
-    printf("*********************\n");
-    printf("1.%s\n", mem_subp[1]);
-    printf("2.%s\n", mem_subp[2]);
-    printf("3.%s\n", mem_subp[3]);
-    printf("0.返回\n");
-}
 
 void add_member_ui() {
     clear_sh();
     print_curr_path();
     getchar();
     while (1) {
-        //char buf[MAX_MEMBER_NAME_LEN];
+        // char buf[MAX_MEMBER_NAME_LEN];
         char buf[MAX_MEMBER_NAME_LEN];
         printf("请输入会员名, 输入#结束:\n");
         my_getline(stdin, buf);
-        //scanf("%s", buf);
-        if (buf[0] == '#')
-            break;
+        // scanf("%s", buf);
+        if (buf[0] == '#') break;
         if (++memn > MAX_MAMBER_NUM) {
             printf("已达最大会员数量, 按任意键返回\n");
             getchar();
@@ -127,8 +113,7 @@ void del_member_ui() {
     printf("\n请输入要删除的会员编号, 输入0结束:\n");
     while (1) {
         mem_id = get_int();
-        if (mem_id == 0)
-            break;
+        if (mem_id == 0) break;
         if (del_member(mem_id) == -1) {
             printf("该会员不存在\n");
         } else {
@@ -145,6 +130,17 @@ void member_list() {
     printf("\n输入任意键返回\n");
     getchar();
     getchar();
+}
+
+static char *mem_subp[] = {"", "查看会员列表", "添加会员", "删除会员"};
+void print_mem_menu() {
+    printf("*********************\n");
+    printf("会员管理系统\n");
+    printf("*********************\n");
+    printf("1.%s\n", mem_subp[1]);
+    printf("2.%s\n", mem_subp[2]);
+    printf("3.%s\n", mem_subp[3]);
+    printf("0.返回\n");
 }
 
 void mem_ui() {
