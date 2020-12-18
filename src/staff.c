@@ -37,11 +37,10 @@ int read_staff(FILE *fp) {
         if (++staffn > MAX_STAFF_NUM) return 0;
         add_staff(staff_id, target_id, buf);
     }
+    return 0;
 }
 
 int write_staff(FILE *fp) {
-    char buf[MAX_STAFF_NUM];
-    int staff_id = 0;
     lnode_ptr curr = staff_head;
     fprintf(fp, "staff-id target_id staff_name\n");
     while (curr != NULL) {

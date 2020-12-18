@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include "room.h"
-#include "utils.h"
 #include "defs.h"
 #include "member.h"
 
@@ -22,7 +21,6 @@ int read_room(FILE *fp) {
 }
 
 int write_room(FILE *fp) {
-    int room_id, owner_mem_id, rent_mem_id;
     fprintf(fp, "room-id owner-id renter-id price\n");
     for (int i = 1; i <= roomn; ++i) {
         fprintf(fp, "%d %d %d %d\n", room[i].room_id, room[i].owner_mem_id,
@@ -100,6 +98,7 @@ int filter_room() {
     int l = find_room_le(lo);
     int r = find_room_se(hi);
     list_ub_room(l, r);
+    return 0;
 }
 
 int buy_room(int input_mem_id) {
@@ -140,6 +139,7 @@ int buy_room(int input_mem_id) {
             }
         }
     }
+    return 0;
 }
 
 int room_price_cmp(const void *a, const void *b) {
@@ -173,6 +173,7 @@ int add_new_room() {
     printf("输入任意键返回\n");
     getchar();
     getchar();
+    return 0;
 }
 
 static char *room_menu_subp[] = {"", "添加房屋", "购买房屋", "查看房屋所有者"};

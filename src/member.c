@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "utils.h"
 #include "linked_list.h"
 #include "defs.h"
 #include "member.h"
@@ -43,12 +42,10 @@ int read_member(FILE *fp) {
         if (++memn > MAX_MAMBER_NUM) return 0;
         add_member(mem_id, room_id, buf);
     }
+    return 0;
 }
 
 int write_member(FILE *fp) {
-    char buf[MAX_MEMBER_NAME_LEN];
-    int room_id = 0;
-    int mem_id = 0;
     lnode_ptr curr = mem_head;
     fprintf(fp, "member-id member-name rent-room-id\n");
     while (curr != NULL) {

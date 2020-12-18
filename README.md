@@ -8,11 +8,11 @@ NEU软院 程序设计课大作业
 
 - Linux
 1. 安装cmake与GNU make
-2. 在项目目录下执行`cmake .`, 然后执行`make`, 编译后会生成可执行文件`ecms`
+2. 在项目目录下执行`cmake . -DCMAKE_BUILD_TYPE=Release`, 然后执行`make`, 编译后会生成可执行文件`ecms`
 
 - Windows
 1. 安装cmake与Mingw, 并添加环境变量
-2. 在项目目录下执行`cmake .`, 然后执行`mingw32-make`, 编译后会生成可执行文件`ecms.exe`
+2. 在项目目录下执行`cmake . -DCMAKE_BUILD_TYPE=Release`, 然后执行`mingw32-make`, 编译后会生成可执行文件`ecms.exe`
 
 ### 从Releases下载预编译版本
 

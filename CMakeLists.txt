@@ -6,7 +6,7 @@ set(SOURCES
     src/bus.c
     src/util.c
     src/member.c
-    src/linked_list_template.c
+    src/linked_list.c
     src/main.c
     src/init.c
     src/main_ui.c
@@ -26,4 +26,5 @@ target_include_directories(ecms
 
 target_link_libraries(ecms m)
 
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_C_FLAGS_DEBUG  "-O2 -Wall -ggdb")
+set(CMAKE_C_FLAGS_RELEASE  "-O2 -Wall")

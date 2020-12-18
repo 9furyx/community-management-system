@@ -29,7 +29,7 @@ int read_location(FILE *fp) {
 int write_location(FILE *fp) {
     fprintf(fp, "location-name location-dirx location-diry\n");
     for (int i = 1; i <= locn; ++i)
-        fprintf(fp, "%lf %lf %s\n", loc[i].name, loc[i].x, loc[i].y);
+        fprintf(fp, "%lf %lf %s\n", loc[i].x, loc[i].y, loc[i].name);
     return 0;
 }
 
@@ -123,7 +123,6 @@ void list_location() {
     for (int i = 1; i <= locn; ++i) printf("%d: %s\n", i, loc[i].name);
 }
 
-
 void add_bus_rsv_member() {
     clear_sh();
     print_curr_path();
@@ -174,8 +173,7 @@ int add_location() {
     clear_sh();
     print_curr_path();
     getchar();
-    char *buf_ptr;
-    char buf[MAX_MEMBER_NAME_LEN];
+    char buf[MAX_LOC_NAME_LEN];
     double dirx = 0, diry = 0;
     if (locn >= MAX_LOC_NUM) {
         printf("已达最大上限\n");
@@ -217,8 +215,7 @@ int del_location() {
 }
 
 // use simulated annealing to calculate approximate TSP
-int *tsp_sa(double dis[][MAX_LOC_NUM], int r_locn,
-            const int *ori_rout) {
+int *tsp_sa(double dis[][MAX_LOC_NUM], int r_locn, const int *ori_rout) {
     static const double INI_T = 1000000, esp = 1e-10, dlt = 0.998, INF = 1e10;
     static int ans_r[MAX_LOC_NUM];
 
@@ -286,12 +283,13 @@ void bus_route_man() {
                                 // delta y to represent total distance
         }
     }
-    int *ans_route;
+    int *ans_route = NULL;
     if (p > 1) ans_route = tsp_sa(dis, p, now);
 
     printf("当前规划路线:\n");
     printf("社区 -> ");
-    for (int i = 1; i <= p; ++i) printf("%s -> ", loc[ans_route[i]].name);
+    if (ans_route != NULL)
+        for (int i = 1; i <= p; ++i) printf("%s -> ", loc[ans_route[i]].name);
     printf("社区\n");
     printf("\n按任意键返回\n");
     getchar();
