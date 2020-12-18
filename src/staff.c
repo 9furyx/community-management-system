@@ -12,7 +12,6 @@ int staffn = 0;
 static int cmp(const void *id, const void *node) {
     return *(int *)id == ((staff_ptr)node)->id;
 }
-static void free_data(const void *staff) { free(((staff_ptr)staff)); }
 
 int add_staff(int id, int target_id, char *name) {
     staff_ptr t = (staff_ptr)malloc(sizeof(staff_t));
@@ -22,7 +21,7 @@ int add_staff(int id, int target_id, char *name) {
     return l_add(&staff_head, t);
 }
 
-int del_staff(int id) { return l_delete(&staff_head, &id, cmp, free_data); }
+int del_staff(int id) { return l_delete(&staff_head, &id, cmp); }
 
 staff_ptr find_staff(int id) {
     return (staff_ptr)(l_find(&staff_head, &id, cmp)->t_ptr);

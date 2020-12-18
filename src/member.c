@@ -14,7 +14,6 @@ int memn = 0;
 static int cmp(const void *id, const void *node) {
     return *(int *)id == ((member_ptr)node)->id;
 }
-static void free_data(const void *mem) { free(((member_ptr)mem)); }
 
 // main utils
 
@@ -26,7 +25,7 @@ int add_member(int id, int room_id, char *name) {
     return l_add(&mem_head, t);
 }
 
-int del_member(int id) { return l_delete(&mem_head, &id, cmp, free_data); }
+int del_member(int id) { return l_delete(&mem_head, &id, cmp); }
 
 member_ptr find_member(int id) {
     lnode_ptr res = l_find(&mem_head, &id, cmp);

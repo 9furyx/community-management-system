@@ -37,11 +37,12 @@ void list_empty_room() {
         if (!room[i].rent_mem_id) printf("roomid: %d\n", room[i].room_id);
     }
 }
-void list_ub_room() {
+void list_ub_room(int l, int r) {
     printf("当前未购买的房屋:\n");
-    for (int i = 1; i <= roomn; ++i) {
+    for (int i = l; i <= r; ++i) {
         if (!room[i].owner_mem_id)
-            printf("roomid: %d    price: %d\n", room[i].room_id, room[i].price);
+            printf("roomid: %d    price: $%d\n", room[i].room_id,
+                   room[i].price);
     }
 }
 void list_room_owner() {
@@ -61,7 +62,7 @@ void list_room_owner() {
 int buy_room(int input_mem_id) {
     clear_sh();
     print_curr_path();
-    list_ub_room();
+    list_ub_room(1, roomn);
     if (!input_mem_id) {
         list_member();
         printf("\n请输入房屋id和会员id,按0结束输入:\n");
@@ -95,6 +96,34 @@ int buy_room(int input_mem_id) {
             }
         }
     }
+}
+
+int find_room(int val) {
+    int l = 1, r = roomn;
+    while (l < r) {
+        int mid = (l + r) >> 1;
+        if (room[mid].price >= val) {
+            r = mid;
+        } else
+            l = mid + 1;
+    }
+    return l;
+}
+int filter_room() {
+    clear_sh();
+    print_curr_path();
+    int lo, hi;
+    printf("请输入房屋价格区间:\n");
+    lo = get_int();
+    hi = get_int();
+    while (lo < 0 || hi < 0 || lo > hi) {
+        printf("请输入合法的区间:\n");
+        lo = get_int();
+        hi = get_int();
+    }
+    int l = find_room(lo);
+    int r = find_room(hi);
+    list_ub_room(l, r);
 }
 
 int room_price_cmp(const void *a, const void *b) {

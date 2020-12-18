@@ -6,7 +6,7 @@
 #include "defs.h"
 #include "path.h"
 
-static char* mainui_subpath[] = {"", "会员管理", "班车管理",
+static char* mainui_subpath[] = {"",         "会员管理", "班车管理",
                                  "房屋管理", "入住管理", "员工管理"};
 void print_main_menu() {
     printf("*********************\n");
@@ -32,26 +32,23 @@ void main_ui() {
             case 1:
                 cd_ch(mainui_subpath[1]);
                 mem_ui();
-                cd_fa();
                 break;
             case 2:
                 cd_ch(mainui_subpath[2]);
                 bus_ui();
-                cd_fa();
                 break;
             case 3:
                 cd_ch(mainui_subpath[3]);
                 room_ui();
-                cd_fa();
                 break;
             case 4:
                 cd_ch(mainui_subpath[4]);
                 checkin_ui();
-                cd_fa();
+                break;
             case 5:
                 cd_ch(mainui_subpath[5]);
                 staff_ui();
-                cd_fa();
+                break;
             case 0:
                 clear_sh();
                 break;
@@ -59,5 +56,6 @@ void main_ui() {
                 printf("invalid number.\n");
                 break;
         }
+        cd_fa();
     } while (choice != 0);
 }
