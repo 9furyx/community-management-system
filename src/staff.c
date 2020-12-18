@@ -53,6 +53,8 @@ int write_staff(FILE *fp) {
     return 0;
 }
 
+void recycle_staff() { l_recycle(&staff_head); }
+
 void list_staff() {
     printf("*********************\n");
     printf("当前所有员工:\n");
@@ -61,7 +63,10 @@ void list_staff() {
         staff_ptr entry = (staff_ptr)(curr->t_ptr);
         member_ptr mem = find_member(entry->target_id);
         char *mem_name = NULL;
-        if (mem != NULL) mem_name = mem->name;
+        if (mem != NULL)
+            mem_name = mem->name;
+        else
+            entry->target_id = 0;
         printf("id:%d    %-10s    服务对象: %d  %s\n", entry->id, entry->name,
                entry->target_id, mem_name);
 
@@ -107,42 +112,47 @@ void del_staff_ui() {
 }
 
 void manage_staff_ui() {
-    clear_sh();
-    print_curr_path();
-    list_member();
-    list_staff();
-
-    int staff_id, mem_id;
-    printf("请输入员工和服务会员编号, 输入0结束:\n");
-    staff_id = get_int();
-    if (staff_id == 0) return;
-    mem_id = get_int();
-    if (mem_id == 0) return;
-    while (staff_id == -1 || mem_id == -1) {
-        printf("请输入合法的id:\n");
+    while (1) {
+        clear_sh();
+        print_curr_path();
+        list_member();
+        list_staff();
+        int staff_id, mem_id;
+        printf("请输入员工和服务会员编号, 为员工分配服务对象, 输入0结束:\n");
         staff_id = get_int();
         if (staff_id == 0) return;
         mem_id = get_int();
         if (mem_id == 0) return;
-    }
-    staff_ptr stf = find_staff(staff_id);
-    if (stf->target_id == mem_id) {
-        printf("当前员工已经服务该会员\n");
-        goto wait;
-    }
-    if (stf->target_id != 0) {
-        printf("当前员工已经服务了: %d号会员, 是否继续 1/0\n", stf->target_id);
-        int choice = get_int();
-        if (choice == 1) {
-            stf->target_id = mem_id;
-            printf("员工: %d,  会员: %d\n", staff_id, mem_id);
+        while (staff_id == -1 || mem_id == -1 || mem_id > get_member_num()) {
+            printf("请输入合法的id:\n");
+            staff_id = get_int();
+            if (staff_id == 0) return;
+            mem_id = get_int();
+            if (mem_id == 0) return;
         }
-    } else {
-        stf->target_id = mem_id;
-        printf("员工: %d,  会员: %d\n", staff_id, mem_id);
+        staff_ptr stf = find_staff(staff_id);
+        if (stf->target_id == mem_id) {
+            printf("当前员工已经服务该会员, 输入任意键继续\n");
+            goto jumpover;
+        }
+        if (stf->target_id != 0) {
+            printf("当前员工已经服务了: %d号会员, 是否继续 1/0\n",
+                   stf->target_id);
+            int choice = get_int();
+            if (choice == 1) {
+                stf->target_id = mem_id;
+                printf("员工: %d,  会员: %d, 输入任意键继续\n", staff_id,
+                       mem_id);
+            }
+        } else {
+            stf->target_id = mem_id;
+            printf("员工: %d,  会员: %d, 输入任意键继续\n", staff_id, mem_id);
+        }
+    jumpover:;
+        getchar();
+        getchar();
     }
 
-wait:;
     printf("输入任意键返回\n");
     getchar();
     getchar();

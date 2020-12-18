@@ -10,20 +10,14 @@ static int fn = 0;
 // read file functions
 static int (*rfflags[])() = {
     //[F_FACILITY] Read_Facility,
-    [F_LOCATION] read_location,
-    [F_MEMBER] read_member,
-    [F_BUS] read_bus,
-    [F_ROOM] read_room,
-    [F_STAFF] read_staff,
+    [F_LOCATION] read_location, [F_MEMBER] read_member, [F_BUS] read_bus,
+    [F_ROOM] read_room,         [F_STAFF] read_staff,
 };
 
 // write file functions
 static int (*wfflags[])() = {
-    [F_LOCATION] write_location,
-    [F_MEMBER] write_member,
-    [F_BUS] write_bus,
-    [F_ROOM] write_room,
-    [F_STAFF] write_staff,
+    [F_LOCATION] write_location, [F_MEMBER] write_member, [F_BUS] write_bus,
+    [F_ROOM] write_room,         [F_STAFF] write_staff,
 };
 
 // defined file names
@@ -114,6 +108,12 @@ int save_file(int F_NUM, char *path[]) {
     return 0;
 }
 
+void recycle_link_memory() {
+    recycle_bus();
+    recycle_member();
+    recycle_staff();
+}
+
 int init(int argc, char *argv[]) {
     int p = 0;
     int start = 1;
@@ -127,5 +127,7 @@ int init(int argc, char *argv[]) {
     if (start == 1 && file_init(argc - p, argv + p - 1) != -1) {
         main_ui();
         save_file(argc - p, argv + p - 1);
+        recycle_link_memory();
     }
+    return 0;
 }

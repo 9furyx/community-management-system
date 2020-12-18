@@ -59,10 +59,54 @@ void list_room_owner() {
     getchar();
     getchar();
 }
+
+// find room price lager or equal
+int find_room_le(int val) {
+    int l = 1, r = roomn;
+    while (l < r) {
+        int mid = (l + r) >> 1;
+        if (room[mid].price >= val) {
+            r = mid;
+        } else
+            l = mid + 1;
+    }
+    return l;
+}
+// find room price smaller or equal
+int find_room_se(int val) {
+    int l = 1, r = roomn;
+    while (l < r) {
+        int mid = (l + r + 1) >> 1;
+        if (room[mid].price <= val) {
+            l = mid;
+        } else
+            r = mid - 1;
+    }
+    return l;
+}
+int filter_room() {
+    clear_sh();
+    print_curr_path();
+    printf("%d", 3 > 1);
+    int lo, hi;
+    printf("请输入房屋价格区间:\n");
+    lo = get_int();
+    hi = get_int();
+    while (lo < 0 || hi < 0 || lo > hi) {
+        printf("请输入合法的区间:\n");
+        lo = get_int();
+        hi = get_int();
+    }
+    int l = find_room_le(lo);
+    int r = find_room_se(hi);
+    list_ub_room(l, r);
+}
+
 int buy_room(int input_mem_id) {
     clear_sh();
     print_curr_path();
-    list_ub_room(1, roomn);
+    filter_room();
+    // list_ub_room(l, r);
     if (!input_mem_id) {
         list_member();
         printf("\n请输入房屋id和会员id,按0结束输入:\n");
@@ -96,34 +140,6 @@ int buy_room(int input_mem_id) {
             }
         }
     }
-}
-
-int find_room(int val) {
-    int l = 1, r = roomn;
-    while (l < r) {
-        int mid = (l + r) >> 1;
-        if (room[mid].price >= val) {
-            r = mid;
-        } else
-            l = mid + 1;
-    }
-    return l;
-}
-int filter_room() {
-    clear_sh();
-    print_curr_path();
-    int lo, hi;
-    printf("请输入房屋价格区间:\n");
-    lo = get_int();
-    hi = get_int();
-    while (lo < 0 || hi < 0 || lo > hi) {
-        printf("请输入合法的区间:\n");
-        lo = get_int();
-        hi = get_int();
-    }
-    int l = find_room(lo);
-    int r = find_room(hi);
-    list_ub_room(l, r);
 }
 
 int room_price_cmp(const void *a, const void *b) {
@@ -183,17 +199,14 @@ void room_ui() {
             case 1:
                 cd_ch(room_menu_subp[1]);
                 add_new_room();
-                cd_fa();
                 break;
             case 2:
                 cd_ch(room_menu_subp[2]);
                 buy_room(0);
-                cd_fa();
                 break;
             case 3:
                 cd_ch(room_menu_subp[3]);
                 list_room_owner();
-                cd_fa();
                 break;
             case 0:
                 clear_sh();
@@ -202,5 +215,6 @@ void room_ui() {
                 printf("invalid number.\n");
                 break;
         }
+        cd_fa();
     } while (choice != 0);
 }

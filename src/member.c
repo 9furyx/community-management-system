@@ -15,7 +15,6 @@ static int cmp(const void *id, const void *node) {
     return *(int *)id == ((member_ptr)node)->id;
 }
 
-
 // main utils
 
 int add_member(int id, int room_id, char *name) {
@@ -60,6 +59,8 @@ int write_member(FILE *fp) {
     }
     return 0;
 }
+
+void recycle_member() { l_recycle(&mem_head); }
 
 int get_member_num() { return memn; }
 void list_member() {
@@ -155,17 +156,14 @@ void mem_ui() {
             case 1:
                 cd_ch(mem_subp[1]);
                 member_list();
-                cd_fa();
                 break;
             case 2:
                 cd_ch(mem_subp[2]);
                 add_member_ui();
-                cd_fa();
                 break;
             case 3:
                 cd_ch(mem_subp[3]);
                 del_member_ui();
-                cd_fa();
                 break;
             case 0:
                 break;
@@ -173,5 +171,6 @@ void mem_ui() {
                 printf("invalid number.\n");
                 break;
         }
+        cd_fa();
     } while (choice != 0);
 }

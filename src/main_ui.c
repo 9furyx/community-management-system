@@ -17,7 +17,7 @@ void print_main_menu() {
     printf("3.%s\n", mainui_subpath[3]);
     printf("4.%s\n", mainui_subpath[4]);
     printf("5.%s\n", mainui_subpath[5]);
-    printf("0.退出\n");
+    printf("0.退出并保存\n");
 }
 
 void main_ui() {
