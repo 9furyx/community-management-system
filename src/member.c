@@ -15,6 +15,7 @@ static int cmp(const void *id, const void *node) {
     return *(int *)id == ((member_ptr)node)->id;
 }
 
+
 // main utils
 
 int add_member(int id, int room_id, char *name) {

@@ -17,12 +17,12 @@ int l_add(struct Link_Node** head,  void *element) {
 }
 
 // delete a node and node data using a specific comparision function and data free function
-int l_delete(lnode_ptr *head, void *element, cmp_t cmp, const void (*free_data)(const void *)) {
+int l_delete(lnode_ptr *head, void *element, cmp_t cmp) {
     while (*head != NULL) {
         if (cmp(element, (*head)->t_ptr)) {
             lnode_ptr entry = *head;
             *head = entry->next;
-            free_data(entry->t_ptr);
+            free(entry->t_ptr);
             free(entry);
             return 0;
         } else
@@ -44,10 +44,11 @@ lnode_ptr l_find(lnode_ptr *head, const void *element, cmp_t cmp) {
 }
 
 // recycle all node memory
-void l_recycle(lnode_ptr *head, void (*free_data)(const void *)) {
+void l_recycle(lnode_ptr *head) {
     while (*head) {
         lnode_ptr entry = *head;
         *head = (*head)->next;
+        free(entry->t_ptr);
         free(entry);
     }
 }

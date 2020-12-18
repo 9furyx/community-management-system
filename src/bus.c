@@ -84,7 +84,6 @@ void list_location() {
 static int cmp(const void *id, const void *node) {
     return *(int *)id == ((bus_ptr)node)->mem_id;
 }
-static void free_data(const void *bus) { free(((bus_ptr)bus)); }
 
 // main utils
 
@@ -97,7 +96,7 @@ int add_bus_mem_to_link(int mem_id, int loc_id) {
 }
 
 int del_bus_mem_from_link(int id) {
-    return l_delete(&bus_head, &id, cmp, free_data);
+    return l_delete(&bus_head, &id, cmp);
 }
 
 bus_ptr find_bus_member(int id) {

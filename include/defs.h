@@ -49,9 +49,9 @@ int write_staff(FILE *);
 
 // linked_list.c
 int l_add(struct Link_Node **, const void *);
-int l_delete(struct Link_Node **, void *, cmp_t, void (*)(const void *));
+int l_delete(struct Link_Node **, void *, cmp_t);
 struct Link_Node *l_find(struct Link_Node **, const void *, cmp_t);
-void l_recycle(struct Link_Node **, void (*)(const void *));
+void l_recycle(struct Link_Node **);
 
 // main_ui.c
 void main_ui(void);
