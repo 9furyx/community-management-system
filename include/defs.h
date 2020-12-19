@@ -17,15 +17,11 @@ void swap(int *, int *);
 
 // bus.c
 void bus_ui(void);
-void bus_rsv_man(void);
-void bus_route_man(void);
-void list_location(void);
 int read_location(FILE *);
 int write_location(FILE *);
 int read_bus(FILE *);
 int write_bus(FILE *);
-void add_bus_rsv_member(void);
-int add_bus_mem_to_link(int, int);
+void recycle_bus(void);
 
 // member.c
 void mem_ui(void);
@@ -33,6 +29,7 @@ int get_member_num(void);
 void list_member(void);
 int read_member(FILE *);
 int write_member(FILE *);
+void recycle_member(void);
 struct Member *find_member(int);
 
 // room.c
@@ -42,11 +39,17 @@ void room_ui();
 int buy_room(int);
 void list_empty_room(void);
 
+// staff.c
+void staff_ui(void);
+int read_staff(FILE *);
+int write_staff(FILE *);
+void recycle_staff(void);
+
 // linked_list.c
 int l_add(struct Link_Node **, const void *);
-int l_delete(struct Link_Node **, void *, cmp_t, void (*)(const void *));
+int l_delete(struct Link_Node **, void *, cmp_t);
 struct Link_Node *l_find(struct Link_Node **, const void *, cmp_t);
-void l_recycle(struct Link_Node **, void (*)(const void *));
+void l_recycle(struct Link_Node **);
 
 // main_ui.c
 void main_ui(void);

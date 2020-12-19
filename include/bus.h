@@ -1,7 +1,6 @@
 #ifndef __LOCATION_H__
 #define __LOCATION_H__
 
-
 #define MAX_LOC_NAME_LEN 128  // maximum length of location name
 #define MAX_LOC_NUM 32        // maximum number of locations
 
@@ -18,6 +17,5 @@ typedef struct Bus {
     int mem_id;
     int loc_id;
 } bus_t, *bus_ptr;
-
 
 #endif

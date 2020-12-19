@@ -11,7 +11,7 @@
 
 lnode_ptr bus_head = NULL;
 struct Location loc[MAX_LOC_NUM];
-int locn = 0;
+int locn = 0;  // tot location number
 
 int read_location(FILE *fp) {
     locn = 0;
@@ -29,8 +29,47 @@ int read_location(FILE *fp) {
 int write_location(FILE *fp) {
     fprintf(fp, "location-name location-dirx location-diry\n");
     for (int i = 1; i <= locn; ++i)
-        fprintf(fp, "%lf %lf %s\n", loc[i].name, loc[i].x, loc[i].y);
+        fprintf(fp, "%lf %lf %s\n", loc[i].x, loc[i].y, loc[i].name);
     return 0;
+}
+
+// main utils
+
+// specific comparision funcion used in linked list template
+static int cmp(const void *id, const void *node) {
+    return *(int *)id == ((bus_ptr)node)->mem_id;
+}
+
+int add_bus_mem_to_link(int mem_id, int loc_id) {
+    bus_ptr t = (bus_ptr)malloc(sizeof(bus_t));
+    t->mem_id = mem_id;
+    t->loc_id = loc_id;
+    loc[loc_id].num++;
+    return l_add(&bus_head, t);
+}
+
+int del_bus_mem_from_link(int id) { return l_delete(&bus_head, &id, cmp); }
+
+bus_ptr find_bus_member(int id) {
+    lnode_ptr result = l_find(&bus_head, &id, cmp);
+    if (result == NULL) return NULL;
+    return result->t_ptr;
+}
+
+void list_bus_rsv_member() {
+    printf("*********************\n");
+    printf("当前预约会员及选择的目的地:\n");
+    lnode_ptr curr = mem_head;
+    while (curr != NULL) {
+        if (curr->t_ptr != NULL) {
+            member_ptr entry = (member_ptr)(curr->t_ptr);
+            bus_ptr f_mem = find_bus_member(entry->id);
+            if (f_mem != NULL && f_mem->loc_id != 0)
+                printf("会员id:%d    %-10s    地点id: %d\n", entry->id,
+                       entry->name, f_mem->loc_id);
+        }
+        curr = curr->next;
+    }
 }
 
 int read_bus(FILE *fp) {
@@ -52,7 +91,10 @@ int write_bus(FILE *fp) {
     return 0;
 }
 
-static char *bus_menu_subp[] = {"", "班车预约", "路线规划", "增加地点"};
+void recycle_bus() { l_recycle(&bus_head); }
+
+static char *bus_menu_subp[] = {"", "班车预约", "路线规划", "增加地点",
+                                "删除地点"};
 void print_bus_menu() {
     printf("*********************\n");
     printf("班车管理系统\n");
@@ -60,6 +102,7 @@ void print_bus_menu() {
     printf("1.%s\n", bus_menu_subp[1]);
     printf("2.%s\n", bus_menu_subp[2]);
     printf("3.%s\n", bus_menu_subp[3]);
+    printf("4.%s\n", bus_menu_subp[4]);
     printf("0.返回\n");
 }
 
@@ -80,47 +123,6 @@ void list_location() {
     for (int i = 1; i <= locn; ++i) printf("%d: %s\n", i, loc[i].name);
 }
 
-// specific funcion used in linked list template
-static int cmp(const void *id, const void *node) {
-    return *(int *)id == ((bus_ptr)node)->mem_id;
-}
-static void free_data(const void *bus) { free(((bus_ptr)bus)); }
-
-// main utils
-
-int add_bus_mem_to_link(int mem_id, int loc_id) {
-    bus_ptr t = (bus_ptr)malloc(sizeof(bus_t));
-    t->mem_id = mem_id;
-    t->loc_id = loc_id;
-    loc[loc_id].num++;
-    return l_add(&bus_head, t);
-}
-
-int del_bus_mem_from_link(int id) {
-    return l_delete(&bus_head, &id, cmp, free_data);
-}
-
-bus_ptr find_bus_member(int id) {
-    lnode_ptr result = l_find(&bus_head, &id, cmp);
-    if (result == NULL) return NULL;
-    return result->t_ptr;
-}
-
-void list_bus_rsv_member() {
-    printf("*********************\n");
-    printf("当前预约会员及选择的目的地:\n");
-    lnode_ptr curr = mem_head;
-    while (curr != NULL) {
-        if (curr->t_ptr != NULL) {
-            member_ptr entry = (member_ptr)(curr->t_ptr);
-            bus_ptr f_mem = find_bus_member(entry->id);
-            if (f_mem != NULL && f_mem->loc_id != 0)
-                printf("会员id:%d    %-10s    地点id: %d\n", entry->id, entry->name,
-                       f_mem->loc_id);
-        }
-        curr = curr->next;
-    }
-}
 void add_bus_rsv_member() {
     clear_sh();
     print_curr_path();
@@ -146,6 +148,7 @@ void add_bus_rsv_member() {
         }
     }
 }
+
 void cancle_bus_rsv() {
     clear_sh();
     print_curr_path();
@@ -170,8 +173,7 @@ int add_location() {
     clear_sh();
     print_curr_path();
     getchar();
-    char *buf_ptr;
-    char buf[MAX_MEMBER_NAME_LEN];
+    char buf[MAX_LOC_NAME_LEN];
     double dirx = 0, diry = 0;
     if (locn >= MAX_LOC_NUM) {
         printf("已达最大上限\n");
@@ -190,9 +192,30 @@ int add_location() {
     return 0;
 }
 
-// use simulated annealing to calculate approximately TSP
-int *tsp_sa(double dis[MAX_LOC_NUM][MAX_LOC_NUM], int r_locn,
-            const int *ori_rout) {
+int del_location() {
+    clear_sh();
+    print_curr_path();
+    list_location();
+    printf("请输入删除地点id, 输入0返回\n");
+    int loc_id = get_int();
+    while (loc_id == -1 || loc_id > locn) {
+        printf("请输入合法的id:\n");
+        loc_id = get_int();
+    }
+    if (loc_id == 0) return 0;
+    for (int i = loc_id; i < locn; ++i) {
+        loc[i] = loc[i + 1];
+    }
+    locn--;
+    printf("已删除地点 id: %d\n", loc_id);
+    printf("输入任意键返回\n");
+    getchar();
+    getchar();
+    return 0;
+}
+
+// use simulated annealing to calculate approximate TSP
+int *tsp_sa(double dis[][MAX_LOC_NUM], int r_locn, const int *ori_rout) {
     static const double INI_T = 1000000, esp = 1e-10, dlt = 0.998, INF = 1e10;
     static int ans_r[MAX_LOC_NUM];
 
@@ -260,13 +283,13 @@ void bus_route_man() {
                                 // delta y to represent total distance
         }
     }
-    int *ans_route;
-    // memcpy(ans_route, now, sizeof(now));
+    int *ans_route = NULL;
     if (p > 1) ans_route = tsp_sa(dis, p, now);
 
     printf("当前规划路线:\n");
     printf("社区 -> ");
-    for (int i = 1; i <= p; ++i) printf("%s -> ", loc[ans_route[i]].name);
+    if (ans_route != NULL)
+        for (int i = 1; i <= p; ++i) printf("%s -> ", loc[ans_route[i]].name);
     printf("社区\n");
     printf("\n按任意键返回\n");
     getchar();
@@ -285,13 +308,10 @@ void bus_rsv_man() {
             case 1:
                 cd_ch(bus_rsv_subp[1]);
                 add_bus_rsv_member();
-                cd_fa();
                 break;
-
             case 2:
                 cd_ch(bus_rsv_subp[2]);
                 cancle_bus_rsv();
-                cd_fa();
                 break;
             case 0:
                 break;
@@ -299,6 +319,7 @@ void bus_rsv_man() {
                 printf("invalid number.\n");
                 break;
         }
+        cd_fa();
     } while (choice != 0);
 }
 
@@ -314,17 +335,18 @@ void bus_ui() {
             case 1:
                 cd_ch(bus_menu_subp[1]);
                 bus_rsv_man();
-                cd_fa();
                 break;
             case 2:
                 cd_ch(bus_menu_subp[2]);
                 bus_route_man();
-                cd_fa();
                 break;
             case 3:
                 cd_ch(bus_menu_subp[3]);
                 add_location();
-                cd_fa();
+                break;
+            case 4:
+                cd_ch(bus_menu_subp[4]);
+                del_location();
                 break;
             case 0:
                 clear_sh();
@@ -333,5 +355,6 @@ void bus_ui() {
                 printf("invalid number.\n");
                 break;
         }
+        cd_fa();
     } while (choice != 0);
 }

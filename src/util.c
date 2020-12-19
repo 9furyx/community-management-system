@@ -5,25 +5,27 @@
 #include <string.h>
 #include "member.h"
 
+// swap two integer
 void swap(int *a, int *b) {
     int tmp = *a;
     *a = *b;
     *b = tmp;
 }
+
 // safely get an integer from stdin
 int get_int() {
+    const long long MAXI = 0x7fffffff;
     static char buf[16];
-    int input_id = 0;
+    long long input_id = 0;
     scanf("%s", buf);
-    if (strlen(buf) > 9)  // limit number length to avoid overflow
-        return -1;
-    for (int i = 0; i < strlen(buf); ++i) {
-        if (buf[i] >= '0' && buf[i] <= '9')  // make sure inputs are numbers
+    for (int i = 0; i < (int)strlen(buf); ++i) {
+        if (buf[i] >= '0' && buf[i] <= '9')  // make sure inputs are valid
             input_id = input_id * 10 + buf[i] - '0';
         else
             return -1;
     }
-    return input_id;
+    if (input_id > MAXI) return -1;
+    return (int)input_id;
 }
 
 int my_getline(FILE *stream, char *string) {
