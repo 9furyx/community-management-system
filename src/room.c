@@ -60,7 +60,7 @@ void list_room_owner() {
 
 // find room price lager or equal
 int find_room_le(int val) {
-    int l = 1, r = roomn;
+    int l = 0, r = roomn;
     while (l < r) {
         int mid = (l + r) >> 1;
         if (room[mid].price >= val) {
@@ -72,7 +72,7 @@ int find_room_le(int val) {
 }
 // find room price smaller or equal
 int find_room_se(int val) {
-    int l = 1, r = roomn;
+    int l = 0, r = roomn;
     while (l < r) {
         int mid = (l + r + 1) >> 1;
         if (room[mid].price <= val) {
@@ -85,7 +85,6 @@ int find_room_se(int val) {
 int filter_room() {
     clear_sh();
     print_curr_path();
-    printf("%d", 3 > 1);
     int lo, hi;
     printf("请输入房屋价格区间:\n");
     lo = get_int();
@@ -97,7 +96,7 @@ int filter_room() {
     }
     int l = find_room_le(lo);
     int r = find_room_se(hi);
-    list_ub_room(l, r);
+    if (l != 0 && r != 0) list_ub_room(l, r);
     return 0;
 }
 

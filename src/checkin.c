@@ -42,13 +42,15 @@ int checkin_ui() {
     clear_sh();
     print_curr_path();
     list_member();
-    printf("\n选择入住人id:");
+    printf("\n选择入住人id:, 输入0返回\n");
     int c1;
     c1 = get_int();
-    while (c1 > get_member_num()||c1==-1) {
+    if (c1 == 0) return 0;
+    while (c1 > get_member_num() || c1 == -1) {
         printf("invalid number.\n");
         printf(":");
         c1 = get_int();
+        if (c1 == 0) return 0;
     }
     printf("选择服务:\n1.选择入住\n2.申请娱乐设施\n");
     int c3;
@@ -77,8 +79,8 @@ int checkin_ui() {
         }
         cd_fa();
     }
-   /* if (c3 == 2) {
-        (c1);  //选择设施
-    }*/
+    /* if (c3 == 2) {
+         (c1);  //选择设施
+     }*/
     return 0;
 }
