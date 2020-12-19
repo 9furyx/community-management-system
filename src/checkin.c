@@ -77,8 +77,8 @@ int checkin_ui() {
         }
         cd_fa();
     }
-    if (c3 == 2) {
+   /* if (c3 == 2) {
         (c1);  //选择设施
-    }
+    }*/
     return 0;
 }
