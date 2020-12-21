@@ -12,12 +12,13 @@ NEU软院 程序设计课大作业
 
 - Windows
 1. 安装cmake与Mingw, 并添加环境变量
-2. 在项目目录下执行`cmake . -DCMAKE_BUILD_TYPE=Release`, 然后执行`mingw32-make`, 编译后会生成可执行文件`ecms.exe`
+2. 在项目目录下执行`cmake . -DCMAKE_BUILD_TYPE=Release -G "MinGW Makefiles"`, 然后执行`mingw32-make`, 编译后会生成可执行文件`ecms.exe`
+(注意: Windows下请使用UTF-8编码, 否则可能1出现中文乱码问题)
 
 ### 从Releases下载预编译版本
 
 - Linux : ecms-linux-64.zip
-- Windows : ecms-windows-64.zip
+- Windows : ecms-windows-64.zip (中文使用GBK编码编译)
 
 
 ## 使用方法
