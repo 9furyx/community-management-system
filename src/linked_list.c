@@ -31,12 +31,9 @@ int l_delete(lnode_ptr *head, void *elem, cmp_t cmp) {
 
 // find a node, using cmp to perform the comparisons
 lnode_ptr l_find(lnode_ptr *head, void *elem, cmp_t cmp) {
-    lnode_ptr curr = *head;
-    while (curr != NULL) {
-        if (cmp(elem, curr->t_ptr)) {
-            return curr;
-        }
-        curr = curr->next;
+    while (*head != NULL) {
+        if (cmp(elem, (*head)->t_ptr)) return *head;
+        head = &(*head)->next;
     }
     return NULL;
 }
